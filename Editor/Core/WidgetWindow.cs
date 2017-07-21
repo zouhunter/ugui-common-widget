@@ -65,6 +65,27 @@ namespace CommonWidget
             EditorGUILayout.PropertyField(scriptProp);
             DrawToolBarHead();
             DrawScrollViewObjs();
+            DrawToolButtons();
+        }
+
+        private void DrawToolButtons()
+        {
+            var rect = new Rect(position.width * 0.92f,50, position.width*0.05f, 100);
+            if (GUI.Button(rect,"A\nL\nI\nN\nE"))
+            {
+                var obj = Selection.activeTransform;
+                if (obj != null && obj.parent != null)
+                {
+                    var rectTrans = obj.GetComponent<RectTransform>();
+                    var parentTrans = obj.transform.parent.GetComponent<RectTransform>();
+                    if (rectTrans != null && parentTrans != null)
+                    {
+                        SetCustomAnchor(parentTrans, rectTrans);
+                        return;
+                    }
+                }
+                EditorUtility.DisplayDialog("未选中", "请先选中需要Aline的对象", "确定");
+            }
         }
 
         private void DrawScrollViewObjs()
@@ -76,7 +97,7 @@ namespace CommonWidget
                 if (currobjhs != null)
                 {
                     int horCount = 3;
-                    var width = (this.position.width - 20) / horCount;
+                    var width = (this.position.width * 0.9f) / horCount;
                     EditorGUILayout.BeginHorizontal();
                     for (int i = 0; i < currobjhs.Length; i++)
                     {
@@ -135,6 +156,26 @@ namespace CommonWidget
             {
                 Debug.Log("找不到" + menu);
             }
+        }
+        public static void SetCustomAnchor(RectTransform parentRectt, RectTransform rectt)
+        {
+            Vector2 sizeDelta = rectt.sizeDelta;
+            Vector2 p_sizeDelta = parentRectt.sizeDelta;
+            Vector2 anchoredPosition = rectt.anchoredPosition;
+            float xmin = p_sizeDelta.x * 0.5f + anchoredPosition.x - sizeDelta.x * 0.5f;
+            float xmax = p_sizeDelta.x * 0.5f + anchoredPosition.x + sizeDelta.x * 0.5f;
+            float ymin = p_sizeDelta.y * 0.5f + anchoredPosition.y - sizeDelta.y * 0.5f;
+            float ymax = p_sizeDelta.y * 0.5f + anchoredPosition.y + sizeDelta.y * 0.5f;
+            float xSize = 0;
+            float ySize = 0;
+            float xanchored = 0;
+            float yanchored = 0;
+            rectt.anchorMin = new Vector2(xmin / p_sizeDelta.x, ymin / p_sizeDelta.y);
+            rectt.anchorMax = new Vector2(xmax / p_sizeDelta.x, ymax / p_sizeDelta.y);
+            rectt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sizeDelta.x);
+            rectt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sizeDelta.y);
+            rectt.sizeDelta = new Vector2(xSize, ySize);
+            rectt.anchoredPosition = new Vector2(xanchored, yanchored);
         }
     }
 }
