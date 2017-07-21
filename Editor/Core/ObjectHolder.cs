@@ -16,15 +16,18 @@ namespace CommonWidget
     public class ObjectHolder
     {
         public GameObject prefab;
-        public GUIContent preview;
+        public Texture preview;
         public string menuName;
 
         public ObjectHolder(string menuName, string assetpath)
         {
             this.menuName = menuName;
             prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetpath);
-            var icon = AssetDatabase.LoadAssetAtPath<Texture>(assetpath.Replace(".prefab", ".png"));
-            preview =new GUIContent(prefab.name, icon);
+            var img = prefab.GetComponentInChildren<Image>();
+            if (img != null)
+            {
+                preview = AssetPreview.GetAssetPreview(img.sprite);
+            }
         }
     }
 }

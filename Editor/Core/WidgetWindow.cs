@@ -75,17 +75,38 @@ namespace CommonWidget
                
                 if (currobjhs != null)
                 {
-                    foreach (var item in currobjhs)
+                    int horCount = 3;
+                    var width = (this.position.width - 20) / horCount;
+                    EditorGUILayout.BeginHorizontal();
+                    for (int i = 0; i < currobjhs.Length; i++)
                     {
-                        GUILayout.Box(item.preview);
-                        var rect = GUILayoutUtility.GetLastRect();
-                        if (Event.current.type == EventType.mouseDown && rect.Contains(Event.current.mousePosition))
+                        if((i + horCount) % horCount == 0)
                         {
-                            activeObjHolder = item;
-                            DragAndDrop.StartDrag(item.prefab.name);
-                            DragAndDrop.objectReferences =new UnityEngine.Object[] { activeObjHolder.prefab };
+                            EditorGUILayout.EndHorizontal();
+                        }
+                        if (i % horCount == 0)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                        }
+                        var item = currobjhs[i];
+                        var click = GUILayout.Button(new GUIContent(item.prefab.name, item.preview), GUILayout.Width(width),GUILayout.Height(width * 0.6f));
+       
+                        if (click)
+                        {
+                            var obj = Selection.activeTransform;
+                            if (obj != null)
+                            {
+                                var rectTrans = obj.GetComponent<RectTransform>();
+                                if (rectTrans != null)
+                                {
+                                    var instence = GameObject.Instantiate(item.prefab);
+                                    instence.transform.SetParent(rectTrans, false);
+                                    instence.name = item.prefab.name;
+                                }
+                            }
                         }
                     }
+                    EditorGUILayout.EndHorizontal();
                 }
             }
         }
