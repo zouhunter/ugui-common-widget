@@ -1,0 +1,5 @@
+{
+  "type": "Toggle",
+  "mask": "Button_Radio_On.png",
+  "background": "Button_Radio_Off.png"
+}

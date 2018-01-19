@@ -31,6 +31,7 @@ namespace CommonWidget
         ObjectHolder[] currobjhs;
         Vector3 scrollpos;
         ObjectHolder activeObjHolder;
+        string userPath;
         private void OnEnable()
         {
             serializeObj = new SerializedObject(this);
@@ -38,11 +39,10 @@ namespace CommonWidget
             LoadObjectHolders();
         }
 
-        private void LoadObjectHolders()
+        private void LoadObjectHolders(string spritePath = null)
         {
-            allobjhs = WidgetUtility.LoadAllGameObject();
-            if (allobjhs == null)
-            {
+            allobjhs = WidgetUtility.LoadAllGameObject(spritePath);
+            if (allobjhs == null){
                 Close();
             }
             else
@@ -56,22 +56,48 @@ namespace CommonWidget
                     }
                 }
                 this.menus = menus.ToArray();
-                LoadCurrObjects();
+                if(menus.Count > 0)
+                {
+                    LoadCurrObjects();
+                }
             }
         }
 
         private void OnGUI()
         {
             EditorGUILayout.PropertyField(scriptProp);
+            DrawUserPath();
             DrawToolBarHead();
             DrawScrollViewObjs();
             DrawToolButtons();
         }
 
+        private void DrawUserPath()
+        {
+            using (var hor = new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("自定义加载路径:",GUILayout.Width(100));
+                EditorGUILayout.LabelField(userPath);
+                if(GUILayout.Button("选择", EditorStyles.miniButtonRight,GUILayout.Width(40)))
+                {
+                    if(Selection.activeObject != null && ProjectWindowUtil.IsFolder(Selection.activeInstanceID))
+                    {
+                        var path = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
+                        userPath = path;
+                        currobjhs = null;
+                        LoadObjectHolders(userPath);
+                    }
+                }
+            }
+        }
+
         private void DrawToolButtons()
         {
-            var rect = new Rect(position.width * 0.92f,50, position.width*0.05f, 100);
-            if (GUI.Button(rect,"A\nL\nI\nN\nE"))
+            var rect = GUILayoutUtility.GetRect(position.width, EditorGUIUtility.singleLineHeight);
+            var lableRect = new Rect(rect.x, rect.y, 40, rect.height);
+            GUI.Label(lableRect,"Tools:");
+            var toolButtons = new Rect(rect.width - 60, rect.y, 60, rect.height);
+            if (GUI.Button(toolButtons, "ALINE"))
             {
                 var obj = Selection.activeTransform;
                 if (obj != null && obj.parent != null)
@@ -96,7 +122,7 @@ namespace CommonWidget
                
                 if (currobjhs != null)
                 {
-                    int horCount = 3;
+                    int horCount = 4;
                     var width = (this.position.width * 0.9f) / horCount;
                     EditorGUILayout.BeginHorizontal();
                     for (int i = 0; i < currobjhs.Length; i++)
@@ -110,21 +136,12 @@ namespace CommonWidget
                             EditorGUILayout.BeginHorizontal();
                         }
                         var item = currobjhs[i];
-                        var click = GUILayout.Button(new GUIContent(item.prefab.name, item.preview), GUILayout.Width(width),GUILayout.Height(width * 0.6f));
-       
+                        var click = GUILayout.Button(new GUIContent(item.Preview), GUILayout.MinWidth(width), GUILayout.MinHeight(width * 0.6f));
+                        var lastRect = GUILayoutUtility.GetLastRect();
+                        GUI.Label(lastRect, item.name);
                         if (click)
                         {
-                            var obj = Selection.activeTransform;
-                            if (obj != null)
-                            {
-                                var rectTrans = obj.GetComponent<RectTransform>();
-                                if (rectTrans != null)
-                                {
-                                    var instence = GameObject.Instantiate(item.prefab);
-                                    instence.transform.SetParent(rectTrans, false);
-                                    instence.name = item.prefab.name;
-                                }
-                            }
+                            item.CreateInstence();
                         }
                     }
                     EditorGUILayout.EndHorizontal();
@@ -137,7 +154,7 @@ namespace CommonWidget
             EditorGUI.BeginChangeCheck();
             currToolbar = GUILayout.Toolbar(currToolbar, menus);
             var changed = EditorGUI.EndChangeCheck();
-            if (changed)
+            if (changed && menus.Length > 0)
             {
                 LoadCurrObjects();
             }

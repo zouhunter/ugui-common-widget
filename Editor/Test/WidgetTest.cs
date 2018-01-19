@@ -13,7 +13,7 @@ public class WidgetTest {
         {
             foreach (var item in objs)
             {
-                Debug.Log(item.prefab.name);
+                Debug.Log(item.name);
             }
         }
         else
@@ -21,5 +21,13 @@ public class WidgetTest {
 
         }
        
+    }
+    [Test]
+    public void CreateUI()
+    {
+        var canvas = Object.FindObjectOfType<Canvas>();
+        Selection.activeObject = canvas;
+        EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
+        EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
     }
 }
