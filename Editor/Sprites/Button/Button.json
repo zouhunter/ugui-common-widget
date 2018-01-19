@@ -1,0 +1,12 @@
+[{
+  "type": "Button",
+  "name":"button01",
+  "highlighted": "Button_Main_Hover.png",
+  "normal": "Button_Main_NoHover.png"
+},
+{
+  "type": "Button",
+  "name":"button02",
+  "highlighted": "Button_Main_Hover.png",
+  "normal": "Button_Main_NoHover.png"
+}]

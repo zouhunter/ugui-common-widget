@@ -10,7 +10,12 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions.Comparers;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 
-public class RawImageCreater : MonoBehaviour {
+namespace CommonWidget
+{
+    public class ConfigWidow : EditorWindow
+    {
 
+    }
 }

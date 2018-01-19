@@ -14,6 +14,7 @@ namespace CommonWidget
 {
     public static class KeyWord
     {
+        public static string name { get; private set; }
         public static string type { get; private set; }
         public static string normal { get; private set; }
         public static string highlighted { get; private set; }

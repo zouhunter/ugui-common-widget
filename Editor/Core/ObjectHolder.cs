@@ -36,18 +36,20 @@ namespace CommonWidget
         private JSONClass json;
         private string assetDir;
 
-        public ObjectHolder(string assetpath)
+        public ObjectHolder(string dir,JSONClass json)
         {
-            this.name = System.IO.Path.GetFileNameWithoutExtension(assetpath);
-            effective = true;
-            var node = JSONClass.Parse(AssetDatabase.LoadAssetAtPath<TextAsset>(assetpath).text);
-            if (node == null)
+            if(json[KeyWord.name] != null)
             {
-                effective = false;
-                return;
+                this.name = json[KeyWord.name];
             }
-
-            json = node.AsObject;
+            else
+            {
+                this.name = json[KeyWord.type].Value;
+            }
+            this.assetDir = dir;
+            effective = true;
+          
+            this.json = json; 
 
             if (string.IsNullOrEmpty(json.ToString()) || string.IsNullOrEmpty(json[KeyWord.type].Value))
             {
@@ -64,7 +66,6 @@ namespace CommonWidget
 
             widgetType = (WidgetType)type;
             effective = true;
-            assetDir = assetpath.Replace(name + ".json", "");
         }
 
         public ObjectHolder(Sprite sprite)
@@ -91,7 +92,15 @@ namespace CommonWidget
                 }
                 else
                 {
-                    return null;
+                    var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Canvas");
+                    if(ok)
+                    {
+                        parent = Selection.activeGameObject.GetComponent<RectTransform>();
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             Selection.activeObject = parent;
@@ -100,6 +109,7 @@ namespace CommonWidget
             if (created != null) {
                 created.transform.SetParent(parent, false);
                 created.name = name;
+                created.transform.localPosition = Vector3.zero;
             }
             return created;
         }

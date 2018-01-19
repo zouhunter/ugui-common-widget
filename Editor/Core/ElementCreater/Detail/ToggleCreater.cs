@@ -39,6 +39,9 @@ namespace CommonWidget
                     background.type = Image.Type.Simple;
                     background.SetNativeSize();
                 }
+
+                var text = toggle.GetComponentInChildren<Text>();
+                text.text = info.name;
                 return created;
             }
             else

@@ -1,0 +1,5 @@
+{
+  "type": "Toggle",
+  "mask": "Button_TickBox_On_Rounded.png",
+  "background": "Button_TickBox_Off_Rounded.png"
+}
