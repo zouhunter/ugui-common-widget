@@ -35,6 +35,7 @@ namespace CommonWidget
 
         private JSONClass json;
         private string assetDir;
+
         public ObjectHolder(string assetpath)
         {
             this.name = System.IO.Path.GetFileNameWithoutExtension(assetpath);
@@ -64,6 +65,14 @@ namespace CommonWidget
             widgetType = (WidgetType)type;
             effective = true;
             assetDir = assetpath.Replace(name + ".json", "");
+        }
+
+        public ObjectHolder(Sprite sprite)
+        {
+            widgetType = WidgetType.Image;
+            name = sprite.name;
+            _textures = new Dictionary<string, Sprite>();
+            _textures.Add(KeyWord.sprite, sprite);
         }
 
         public GameObject CreateInstence()

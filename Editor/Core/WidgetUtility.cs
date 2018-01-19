@@ -36,14 +36,8 @@ namespace CommonWidget
             if (!string.IsNullOrEmpty(spritePath))
             {
                 var fullPath = Path.GetFullPath(spritePath);
-                string[] rules = Directory.GetFiles(fullPath, "*.json", SearchOption.AllDirectories);
-                foreach (var rulepath in rules)
-                {
-                    var assetpath = rulepath.Replace("\\", "/").Replace(Application.dataPath, "Assets");
-                    var holder = new ObjectHolder(assetpath);
-                    holders.Add(holder);
-                }
-
+                holders.AddRange( LoadAllUserDefine(fullPath));
+                holders.AddRange(LoadAllSprites(fullPath));
                 return holders.ToArray();
             }
             else
@@ -51,6 +45,41 @@ namespace CommonWidget
                 Debug.LogError("[加载对象失败] " + "保存预制体的文件夹.meta发生了变化，请重新设置本脚本中的PrefabPathGUID");
                 return null;
             }
+        }
+        private static List<ObjectHolder> LoadAllSprites(string fullpath)
+        {
+            var holders = new List<ObjectHolder>();
+            string[] spritepaths = Directory.GetFiles(fullpath, "*.png", SearchOption.AllDirectories);
+            foreach (var spritepath in spritepaths)
+            {
+                var assetpath = spritepath.Replace("\\", "/").Replace(Application.dataPath, "Assets");
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetpath);
+                if (sprite != null)
+                {
+                    var holder = new ObjectHolder(sprite);
+                    holders.Add(holder);
+                }
+            }
+            return holders;
+        }
+        private static List<ObjectHolder> LoadAllUserDefine(string fullPath)
+        {
+            var holders = new List<ObjectHolder>();
+            string[] rules = Directory.GetFiles(fullPath, "*.json", SearchOption.AllDirectories);
+            foreach (var rulepath in rules)
+            {
+                var assetpath = rulepath.Replace("\\", "/").Replace(Application.dataPath, "Assets");
+                var holder = new ObjectHolder(assetpath);
+                holders.Add(holder);
+            }
+            return holders;
+        }
+
+        internal static void InitImage(Image image,Sprite sprite, Image.Type simple = Image.Type.Simple)
+        {
+            image.sprite = sprite;
+            image.type = Image.Type.Simple;
+            image.SetNativeSize();
         }
 
         public static GameObject CreateInstence(WidgetType type,CreateInfo info)

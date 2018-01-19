@@ -14,14 +14,6 @@ namespace CommonWidget
 {
     public static class KeyWord
     {
-        static KeyWord()
-        {
-            var keys = typeof(KeyWord).GetProperties(System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            foreach (var item in keys)
-            {
-                item.SetValue(null, item.Name,null);
-            }
-        }
         public static string type { get; private set; }
         public static string normal { get; private set; }
         public static string highlighted { get; private set; }
@@ -29,5 +21,16 @@ namespace CommonWidget
         public static string disabled { get; private set; }
         public static string background { get; private set; }
         public static string mask { get; private set; }
+        public static string sprite { get; internal set; }
+
+        static KeyWord()
+        {
+            var keys = typeof(KeyWord).GetProperties(System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            foreach (var item in keys)
+            {
+                item.SetValue(null, item.Name, null);
+            }
+        }
+
     }
 }

@@ -10,16 +10,7 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions.Comparers;
 using System.Collections;
 using System.Collections.Generic;
-namespace CommonWidget
-{
-    public enum WidgetType
-    {
-        Button,
-        Toggle,
-        Slider,
-        Scrollbar,
-        Image,
-        Dropdown,
-        InputField
-    }
+
+public class RawImageCreater : MonoBehaviour {
+
 }
