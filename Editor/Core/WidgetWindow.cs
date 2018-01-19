@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using System;
+using System.Text.RegularExpressions;
 
 namespace CommonWidget
 {
@@ -32,6 +33,7 @@ namespace CommonWidget
         Vector3 scrollpos;
         ObjectHolder activeObjHolder;
         string userPath;
+        string match;
         private void OnEnable()
         {
             serializeObj = new SerializedObject(this);
@@ -68,8 +70,24 @@ namespace CommonWidget
             EditorGUILayout.PropertyField(scriptProp);
             DrawUserPath();
             DrawToolBarHead();
+            DrawSurchOption();
             DrawScrollViewObjs();
             DrawToolButtons();
+        }
+
+        private void DrawSurchOption()
+        {
+            EditorGUI.BeginChangeCheck();
+            match = EditorGUILayout.TextField(match);
+            if(EditorGUI.EndChangeCheck())
+            {
+                LoadCurrObjects();
+                var containsKey = new List<ObjectHolder>(currobjhs);
+                Regex regex = new Regex(match, RegexOptions.IgnoreCase);
+                if (!string.IsNullOrEmpty(match)){
+                    currobjhs = containsKey.FindAll(x => regex.Match( x.name).Length > 0).ToArray();
+                }
+            }
         }
 
         private void DrawUserPath()
