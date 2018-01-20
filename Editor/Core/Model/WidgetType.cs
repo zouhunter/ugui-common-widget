@@ -22,7 +22,6 @@ namespace CommonWidget
         Image,
         Dropdown,
         InputField,
-        DropDown,
         CercalSlider
     }
 }
