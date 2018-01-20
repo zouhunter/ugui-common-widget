@@ -40,7 +40,38 @@ namespace CommonWidget
             scriptProp = serializeObj.FindProperty("m_Script");
             LoadObjectHolders();
         }
+        private void OnGUI()
+        {
+            EditorGUILayout.PropertyField(scriptProp);
+            DrawUserPath();
+            DrawToolBarHead();
+            DrawSurchOption();
+            DrawScrollViewObjs();
+            DrawToolButtons();
+        }
+        private void OnDisable()
+        {
+            MakeUISpriteTypeBack();
+        }
+        private void MakeUISpriteTypeBack()
+        {
+            foreach (var item in allobjhs)
+            {
+                if (item.spriteDic == null) continue;
+                float current = 0;
+                float all = item.spriteDic.Count;
+                foreach (var spriteItem in item.spriteDic)
+                {
+                    EditorUtility.DisplayProgressBar("wait", "还原图片状态", current++ / all);
 
+                    if (spriteItem.Value != null)
+                    {
+                        WidgetUtility.MakeSpriteAsUISprite(spriteItem.Value);
+                    }
+                }
+            }
+            EditorUtility.ClearProgressBar();
+        }
         private void LoadObjectHolders(string spritePath = null)
         {
             allobjhs = WidgetUtility.LoadAllGameObject(spritePath);
@@ -65,15 +96,7 @@ namespace CommonWidget
             }
         }
 
-        private void OnGUI()
-        {
-            EditorGUILayout.PropertyField(scriptProp);
-            DrawUserPath();
-            DrawToolBarHead();
-            DrawSurchOption();
-            DrawScrollViewObjs();
-            DrawToolButtons();
-        }
+    
 
         private void DrawSurchOption()
         {

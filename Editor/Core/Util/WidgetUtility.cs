@@ -78,10 +78,7 @@ namespace CommonWidget
         {
             var holders = new List<ObjectHolder>();
             string[] spritepaths = Directory.GetFiles(fullpath, "*.png", SearchOption.AllDirectories);
-
-            float current = 0;
-            float all = spritepaths.Length;
-
+            
             foreach (var spritepath in spritepaths)
             {
                 var assetpath = spritepath.Replace("\\", "/").Replace(Application.dataPath, "Assets");
@@ -90,11 +87,8 @@ namespace CommonWidget
                 {
                     var holder = new ObjectHolder(sprite);
                     holders.Add(holder);
-                    MakeSpriteReadable(sprite);
-                    EditorUtility.DisplayProgressBar("wait", "图片格式转换中", ++current / all);
                 }
             }
-            EditorUtility.ClearProgressBar();
             return holders;
         }
 
@@ -129,14 +123,25 @@ namespace CommonWidget
             }
             return holders;
         }
-        public static void MakeSpriteReadable(Sprite sprite)
+        public static void MakeTextureReadable(Texture texture)
         {
-            var path = AssetDatabase.GetAssetPath(sprite.texture);
+            var path = AssetDatabase.GetAssetPath(texture);
             var textureImporter = TextureImporter.GetAtPath(path) as TextureImporter;
             if (textureImporter.textureType != TextureImporterType.Advanced || !textureImporter.isReadable)
             {
                 textureImporter.isReadable = true;
                 textureImporter.textureType = TextureImporterType.Advanced;
+                textureImporter.SaveAndReimport();
+            }
+        }
+        public static void MakeSpriteAsUISprite(Sprite sprite)
+        {
+            var path = AssetDatabase.GetAssetPath(sprite.texture);
+            var textureImporter = TextureImporter.GetAtPath(path) as TextureImporter;
+            if (textureImporter.textureType != TextureImporterType.Sprite || textureImporter.isReadable)
+            {
+                textureImporter.isReadable = false;
+                textureImporter.textureType = TextureImporterType.Sprite;
                 textureImporter.SaveAndReimport();
             }
         }
@@ -192,8 +197,6 @@ namespace CommonWidget
             if (json[KeyWord.image] != null && json[KeyWord.image].AsObject != null)
             {
                 var obj = json[KeyWord.image].AsObject;
-                float current = 0;
-                float all = obj.Count;
                 foreach (var item in obj)
                 {
                     var keyValue = JSONArray.Parse(item.ToString());
@@ -216,12 +219,10 @@ namespace CommonWidget
 
                     if (sprite != null)
                     {
-                        MakeSpriteReadable(sprite);
-                        EditorUtility.DisplayProgressBar("wait", "图片格式转换中", ++current / all);
                         spriteDic.Add(keyValue[0], sprite);
                     }
                 }
-                EditorUtility.ClearProgressBar();
+              
             }
 
             return spriteDic;
@@ -236,17 +237,32 @@ namespace CommonWidget
         {
             if (list == null || list.Count == 0) return null;
             Texture2D texture = null;
+
             foreach (var sprite in list)
             {
                 if (sprite == null) continue;
                 if (sprite.texture == null) continue;
-                var current = ConventSpriteToTexture(sprite);
+
+                var path = AssetDatabase.GetAssetPath(sprite.texture);
+                var textureImporter = TextureImporter.GetAtPath(path) as TextureImporter;
+                Texture2D current = null;
+
+                if (textureImporter.spriteImportMode == SpriteImportMode.Multiple)
+                {
+                    current = ConventSpriteToTexture(sprite);
+                }
+                else
+                {
+                    current = sprite.texture;
+                }
+
                 if (texture == null)
                 {
                     texture = current;
                 }
                 else
                 {
+                    MakeTextureReadable(current);
                     CoverTexture(texture, current);
                 }
             }
@@ -254,6 +270,8 @@ namespace CommonWidget
         }
         private static Texture2D ConventSpriteToTexture(Sprite sprite)
         {
+            MakeTextureReadable(sprite.texture);
+
             int width = (int)sprite.rect.width;
             int height = (int)sprite.rect.height;
             var rect = sprite.textureRect;
