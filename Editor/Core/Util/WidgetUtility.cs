@@ -25,7 +25,7 @@ namespace CommonWidget
         public const string Menu_widgetWindow = "Window/Widget/Common";
         public const string Menu_widgetConfig = "Window/Widget/Config";
         private static Dictionary<WidgetType, IElementCreater> createrDic;
-        
+
         /// <summary>
         /// 从PrefabPathGUID加载所有的预制体
         /// </summary>
@@ -33,12 +33,12 @@ namespace CommonWidget
         public static ObjectHolder[] LoadAllGameObject(string spritePath = null)
         {
             var holders = new List<ObjectHolder>();
-            if(string.IsNullOrEmpty(spritePath))
+            if (string.IsNullOrEmpty(spritePath))
                 spritePath = AssetDatabase.GUIDToAssetPath(SpritePathGUID);
             if (!string.IsNullOrEmpty(spritePath))
             {
                 var fullPath = Path.GetFullPath(spritePath);
-                holders.AddRange( LoadAllUserDefine(fullPath));
+                holders.AddRange(LoadAllUserDefine(fullPath));
                 holders.AddRange(LoadAllSprites(fullPath));
                 return holders.ToArray();
             }
@@ -53,9 +53,12 @@ namespace CommonWidget
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public static WidgetItem[] LoadWidgeItems(string json,string assetDir)
+        public static WidgetItem[] LoadWidgeItems(string json, string assetDir)
         {
+            if (string.IsNullOrEmpty(json)) return null;
+
             var items = new List<WidgetItem>();
+
             var jsonarray = JSONNode.Parse(json).AsArray;
             foreach (var nodeItem in jsonarray)
             {
@@ -75,6 +78,10 @@ namespace CommonWidget
         {
             var holders = new List<ObjectHolder>();
             string[] spritepaths = Directory.GetFiles(fullpath, "*.png", SearchOption.AllDirectories);
+
+            float current = 0;
+            float all = spritepaths.Length;
+
             foreach (var spritepath in spritepaths)
             {
                 var assetpath = spritepath.Replace("\\", "/").Replace(Application.dataPath, "Assets");
@@ -83,8 +90,11 @@ namespace CommonWidget
                 {
                     var holder = new ObjectHolder(sprite);
                     holders.Add(holder);
+                    MakeSpriteReadable(sprite);
+                    EditorUtility.DisplayProgressBar("wait", "图片格式转换中", ++current / all);
                 }
             }
+            EditorUtility.ClearProgressBar();
             return holders;
         }
 
@@ -99,13 +109,14 @@ namespace CommonWidget
                 var assetDir = assetpath.Replace(jsonname, "");
 
                 var jsonString = AssetDatabase.LoadAssetAtPath<TextAsset>(assetpath).text;
-                if (string.IsNullOrEmpty(jsonString)){
+                if (string.IsNullOrEmpty(jsonString))
+                {
                     continue;
                 }
 
                 var jsonarray = JSONArray.Parse(jsonString).AsArray;
                 if (jsonarray == null) continue;
-                
+
                 foreach (var nodeItem in jsonarray)
                 {
                     if (nodeItem != null && nodeItem is JSONClass)
@@ -118,15 +129,25 @@ namespace CommonWidget
             }
             return holders;
         }
-
-        internal static void InitImage(Image image,Sprite sprite, Image.Type simple = Image.Type.Simple)
+        public static void MakeSpriteReadable(Sprite sprite)
+        {
+            var path = AssetDatabase.GetAssetPath(sprite.texture);
+            var textureImporter = TextureImporter.GetAtPath(path) as TextureImporter;
+            if (textureImporter.textureType != TextureImporterType.Advanced || !textureImporter.isReadable)
+            {
+                textureImporter.isReadable = true;
+                textureImporter.textureType = TextureImporterType.Advanced;
+                textureImporter.SaveAndReimport();
+            }
+        }
+        internal static void InitImage(Image image, Sprite sprite, Image.Type simple = Image.Type.Simple)
         {
             image.sprite = sprite;
             image.type = Image.Type.Simple;
             image.SetNativeSize();
         }
 
-        public static GameObject CreateInstence(WidgetType type,WidgetItem info)
+        public static GameObject CreateInstence(WidgetType type, WidgetItem info)
         {
             var creater = GetCreater(type);
             return creater.CreateInstence(info);
@@ -134,7 +155,8 @@ namespace CommonWidget
         public static Texture CreatePreview(WidgetType type, WidgetItem info)
         {
             var creater = GetCreater(type);
-            return creater.CreatePreview(info);
+            var list = creater.GetPreviewList(info);
+            return GetPreviewFromSpriteList(list);
         }
         internal static List<string> GetKeys(WidgetType type)
         {
@@ -143,48 +165,138 @@ namespace CommonWidget
         }
         private static IElementCreater GetCreater(WidgetType type)
         {
-            if(createrDic == null)
+            if (createrDic == null)
             {
                 createrDic = new Dictionary<WidgetType, IElementCreater>();
             }
-            
-            if(!createrDic.ContainsKey(type))
+
+            if (!createrDic.ContainsKey(type))
             {
                 var typeName = "CommonWidget." + type.ToString() + "Creater";
                 var createrType = typeof(IElementCreater).Assembly.GetType(typeName);
-                if(createrType == null)
+                if (createrType == null)
                 {
                     Debug.LogError("请编写:" + typeName);
                     return null;
                 }
-                createrDic.Add(type,System.Activator.CreateInstance(createrType) as IElementCreater);
+                createrDic.Add(type, System.Activator.CreateInstance(createrType) as IElementCreater);
             }
 
             return createrDic[type];
 
         }
-        public static Dictionary<string, Sprite> LoadTextures(JSONClass json,string assetDir)
+
+        public static Dictionary<string, Sprite> LoadTextures(JSONClass json, string assetDir)
         {
             var spriteDic = new Dictionary<string, Sprite>();
             if (json[KeyWord.image] != null && json[KeyWord.image].AsObject != null)
             {
                 var obj = json[KeyWord.image].AsObject;
+                float current = 0;
+                float all = obj.Count;
                 foreach (var item in obj)
                 {
                     var keyValue = JSONArray.Parse(item.ToString());
-                    if (keyValue.Count < 2 || string.IsNullOrEmpty(keyValue[0]) || string.IsNullOrEmpty(keyValue[1])) continue;
-                    var texturePath = assetDir + keyValue[1];
-                    var texture = AssetDatabase.LoadAssetAtPath<Sprite>(texturePath);
-                    if (texture != null)
+                    if (keyValue.Count < 2 || string.IsNullOrEmpty(keyValue[0])) continue;
+
+                    Sprite sprite = null;
+                    if (!string.IsNullOrEmpty(keyValue[1].Value))
                     {
-                        spriteDic.Add(keyValue[0], texture);
+                        var texturePath = assetDir + keyValue[1];
+                        sprite = AssetDatabase.LoadAssetAtPath<Sprite>(texturePath);
+                    }
+                    else if (keyValue[1].AsArray != null)
+                    {
+                        var texturesPath = assetDir + keyValue[1].AsArray[0].Value;
+                        var spriteName = keyValue[1].AsArray[1].Value;
+                        var sprites = AssetDatabase.LoadAllAssetsAtPath(texturesPath);
+
+                        sprite = sprites.Where(x => x != null && x.name == spriteName).FirstOrDefault() as Sprite;
+                    }
+
+                    if (sprite != null)
+                    {
+                        MakeSpriteReadable(sprite);
+                        EditorUtility.DisplayProgressBar("wait", "图片格式转换中", ++current / all);
+                        spriteDic.Add(keyValue[0], sprite);
                     }
                 }
+                EditorUtility.ClearProgressBar();
             }
 
             return spriteDic;
         }
 
+        /// <summary>
+        /// 利用一组sprite.创建preview
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static Texture GetPreviewFromSpriteList(List<Sprite> list)
+        {
+            if (list == null || list.Count == 0) return null;
+            Texture2D texture = null;
+            foreach (var sprite in list)
+            {
+                if (sprite == null) continue;
+                if (sprite.texture == null) continue;
+                var current = ConventSpriteToTexture(sprite);
+                if (texture == null)
+                {
+                    texture = current;
+                }
+                else
+                {
+                    CoverTexture(texture, current);
+                }
+            }
+            return texture;
+        }
+        private static Texture2D ConventSpriteToTexture(Sprite sprite)
+        {
+            int width = (int)sprite.rect.width;
+            int height = (int)sprite.rect.height;
+            var rect = sprite.textureRect;
+            var croppedTexture = new Texture2D(width, height);
+            //var pixels = sprite.texture.GetPixels((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    var i0 = (int)rect.x + i;
+                    var j0 = (int)rect.y + j;
+                    if (i0 < sprite.texture.width && j0 < sprite.texture.height)
+                    {
+                        croppedTexture.SetPixel(i,j,sprite.texture.GetPixel(i0,j0));
+                    }
+                }
+            }
+            croppedTexture.Apply();
+            return croppedTexture;
+        }
 
+        private static Texture2D CoverTexture(Texture2D down, Texture2D up)
+        {
+            var newTexture = new Texture2D(down.width, down.height);
+            var xSpan = (int)((down.width - up.width) / 2);
+            var ySpan = (int)((down.height - up.height) / 2);
+
+            for (int i = 0; i < down.width; i++)
+            {
+                for (int j = 0; j < down.height; j++)
+                {
+                    if (i > xSpan && i < down.width - xSpan)
+                    {
+                        var pix = up.GetPixel(i - xSpan, j - ySpan);
+                        newTexture.SetPixel(i, j, pix);
+                    }
+                    else
+                    {
+                        newTexture.SetPixel(i, j, down.GetPixel(i, j));
+                    }
+                }
+            }
+            return down;
+        }
     }
 }

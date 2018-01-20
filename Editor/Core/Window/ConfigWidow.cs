@@ -73,10 +73,12 @@ namespace CommonWidget
             string dir = filePath.Replace(System.IO.Path.GetFileName(filePath), "");
 
             var jsonArray = new JSONArray();
-            foreach (var item in widgetItems){
+            foreach (var item in widgetItems)
+            {
                 jsonArray.Add(item.ToJson(dir));
             }
             System.IO.File.WriteAllText(filePath, jsonArray.ToString());
+            AssetDatabase.Refresh();
         }
 
         private void DrawJsonFile()
@@ -175,8 +177,8 @@ namespace CommonWidget
             var filePath = AssetDatabase.GetAssetPath(jsonFile);
             string dir = filePath.Replace(System.IO.Path.GetFileName(filePath), "");
             var json = jsonFile.text;
-            var loaded = WidgetUtility.LoadWidgeItems(json,dir);
-            if(loaded != null)
+            var loaded = WidgetUtility.LoadWidgeItems(json, dir);
+            if (loaded != null)
             {
                 widgetItems.Clear();
                 widgetItems.AddRange(loaded);
@@ -204,7 +206,7 @@ namespace CommonWidget
         }
         private void SaveCurrentConfig()
         {
-            if(jsonFile != null)
+            if (jsonFile != null)
             {
                 var path = AssetDatabase.GetAssetPath(jsonFile);
                 var guid = AssetDatabase.AssetPathToGUID(path);

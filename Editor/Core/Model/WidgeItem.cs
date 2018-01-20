@@ -56,14 +56,26 @@ namespace CommonWidget
             return json;
         }
 
-        private string GetSpritePath(string root, Sprite sprite)
+        private JSONNode GetSpritePath(string root, Sprite sprite)
         {
             var texture = sprite.texture;
             var path = AssetDatabase.GetAssetPath(texture);
-            if(path.Length < root.Length) {
+            if (path.Length < root.Length){
                 Debug.LogError("请确保图片在文档的同文件夹或子文件夹下!");
             }
-            return path.Replace(root, "");
+            var textureImporter = TextureImporter.GetAtPath(path) as TextureImporter;
+            var texturePath = path.Replace(root, "");
+            if (textureImporter.spriteImportMode == SpriteImportMode.Multiple)
+            {
+                var jsonArray = new JSONArray();
+                jsonArray.Add(texturePath);
+                jsonArray.Add(sprite.name);
+                return jsonArray;
+            }
+            else
+            {
+                return texturePath;
+            }
         }
 
         void InitSpriteDic()

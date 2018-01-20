@@ -49,15 +49,15 @@ namespace CommonWidget
                 return null;
             }
         }
-        public override Texture CreatePreview(WidgetItem info)
+        public override List<Sprite> GetPreviewList(WidgetItem info)
         {
-            Texture2D texture = null;
+            List<Sprite> list = new List<Sprite>();
             var spriteDic = info.spriteDic;
             if (spriteDic.ContainsKey(KeyWord.background)){
                 var sprite = spriteDic[KeyWord.background];
-                texture = sprite.texture as Texture2D;
+                list.Add(sprite);
             }
-            return texture;
+            return list;
         }
         protected override List<string> CreateDefultList()
         {

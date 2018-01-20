@@ -68,20 +68,21 @@ namespace CommonWidget
                 return null;
             }
         }
-        public override Texture CreatePreview(WidgetItem info)
+
+        public override List<Sprite> GetPreviewList(WidgetItem info)
         {
-            Texture texture = null;
+            List<Sprite> List = new List<Sprite>();
             var spriteDic = info.spriteDic;
             if (spriteDic.ContainsKey(KeyWord.normal))
             {
                 var sprite = spriteDic[KeyWord.normal];
-                texture = sprite.texture;
+                List.Add(sprite);
             }
-            return texture;
+            return List;
         }
         protected override List<string> CreateDefultList()
         {
-            return new List<string>() { KeyWord.normal,KeyWord.pressed,KeyWord.highlighted,KeyWord.disabled };
+            return new List<string>() { KeyWord.normal, KeyWord.pressed, KeyWord.highlighted, KeyWord.disabled };
         }
     }
 }

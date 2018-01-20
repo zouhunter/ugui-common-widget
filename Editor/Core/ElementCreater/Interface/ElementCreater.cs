@@ -19,7 +19,7 @@ namespace CommonWidget
         private List<string> _keys;
         public virtual List<string> Keys { get { if (_keys == null) _keys = CreateDefultList(); return _keys; } }
         public abstract GameObject CreateInstence(WidgetItem info);
-        public abstract Texture CreatePreview(WidgetItem info);
+        public abstract List<Sprite> GetPreviewList(WidgetItem info);
         protected abstract List<string> CreateDefultList();
     }
 }

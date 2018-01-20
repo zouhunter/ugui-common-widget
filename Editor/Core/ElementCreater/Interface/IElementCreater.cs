@@ -17,7 +17,7 @@ namespace CommonWidget
     {
         List<string> Keys { get; }
         GameObject CreateInstence(WidgetItem info);
-        Texture CreatePreview(WidgetItem info);
+        List<Sprite> GetPreviewList(WidgetItem info);
     }
 
 }
