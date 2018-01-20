@@ -262,6 +262,7 @@ namespace CommonWidget
                 }
                 else
                 {
+                    MakeTextureReadable(texture);
                     MakeTextureReadable(current);
                     CoverTexture(texture, current);
                 }

@@ -24,6 +24,8 @@ namespace CommonWidget
         public static string mask { get; private set; }
         public static string sprite { get; internal set; }
         public static string image { get; internal set; }
+        public static string fill { get; internal set; }
+        public static string handle { get; internal set; }
 
         static KeyWord()
         {
