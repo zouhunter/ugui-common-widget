@@ -19,17 +19,33 @@ namespace CommonWidget
     {
         public override GameObject CreateInstence(WidgetItem info)
         {
-            throw new NotImplementedException();
+            var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Input Field");
+            if (ok)
+            {
+                var inputfield = Selection.activeGameObject.GetComponent<InputField>();
+                if (info.spriteDic.ContainsKey(KeyWord.background)){
+                    var image = inputfield.targetGraphic as Image;
+                    WidgetUtility.InitImage(image, info.spriteDic[KeyWord.background]);
+                }
+
+                return inputfield.gameObject;
+            }
+            return null;
         }
 
         public override List<Sprite> GetPreviewList(WidgetItem info)
         {
-            throw new NotImplementedException();
+            var list = new List<Sprite>();
+            if(info.spriteDic.ContainsKey(KeyWord.background))
+            {
+                list.Add(info.spriteDic[KeyWord.background]);
+            }
+            return list;
         }
 
         protected override List<string> CreateDefultList()
         {
-            throw new NotImplementedException();
+            return new List<string>() { KeyWord.background };
         }
     }
 }
