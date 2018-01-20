@@ -14,7 +14,7 @@ using System;
 
 namespace CommonWidget
 {
-    public class CercalSliderCreater : ElementCreater
+    public class ScrollBarCreater : ElementCreater
     {
         public override GameObject CreateInstence(WidgetItem info)
         {

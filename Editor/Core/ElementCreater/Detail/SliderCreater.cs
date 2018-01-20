@@ -14,7 +14,7 @@ using System;
 
 namespace CommonWidget
 {
-    public class CercalSliderCreater : ElementCreater
+    public class SliderCreater : ElementCreater
     {
         public override GameObject CreateInstence(WidgetItem info)
         {
@@ -31,4 +31,5 @@ namespace CommonWidget
             throw new NotImplementedException();
         }
     }
+
 }

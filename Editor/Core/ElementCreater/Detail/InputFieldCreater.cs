@@ -10,11 +10,12 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions.Comparers;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using System;
 
 namespace CommonWidget
 {
-    public class CercalSliderCreater : ElementCreater
+    public class InputFieldCreater : ElementCreater
     {
         public override GameObject CreateInstence(WidgetItem info)
         {
