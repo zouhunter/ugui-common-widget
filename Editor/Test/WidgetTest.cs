@@ -30,4 +30,16 @@ public class WidgetTest {
         EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
         EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
     }
+
+    [Test]
+    public void SubSpriteTest()
+    {
+        var assetPath = "Assets/Editor/Test/atlastTest.png";
+        var sprites = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+        Debug.Log(sprites.Length);
+        foreach (var item in sprites)
+        {
+            Debug.Log(item);
+        }
+    }
 }

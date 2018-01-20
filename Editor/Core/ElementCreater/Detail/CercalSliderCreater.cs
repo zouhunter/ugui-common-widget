@@ -10,7 +10,27 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions.Comparers;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
-public class CercalSliderCreater : MonoBehaviour {
+namespace CommonWidget
+{
+    public class CercalSliderCreater : IElementCreater
+    {
+        public List<string> Keys
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public GameObject CreateInstence(WidgetItem info)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Texture CreatePreview(WidgetItem info)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

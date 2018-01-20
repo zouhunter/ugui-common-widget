@@ -10,12 +10,19 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions.Comparers;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-
 namespace CommonWidget
 {
-    public class ConfigWidow : EditorWindow
+    //组件类型,可自定义(控制器命名方式: 后加"Creater")
+    public enum WidgetType
     {
-
+        Button,
+        Toggle,
+        Slider,
+        Scrollbar,
+        Image,
+        Dropdown,
+        InputField,
+        DropDown,
+        CercalSlider
     }
 }

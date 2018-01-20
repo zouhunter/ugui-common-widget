@@ -15,8 +15,9 @@ namespace CommonWidget
 
     public interface IElementCreater
     {
-        GameObject CreateInstence(CreateInfo info);
-        Texture CreatePreview(CreateInfo info);
+        List<string> Keys { get; }
+        GameObject CreateInstence(WidgetItem info);
+        Texture CreatePreview(WidgetItem info);
     }
 
 }

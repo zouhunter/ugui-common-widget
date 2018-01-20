@@ -25,6 +25,7 @@ namespace CommonWidget
         public const string Menu_widgetWindow = "Window/Widget/Common";
         public const string Menu_widgetConfig = "Window/Widget/Config";
         private static Dictionary<WidgetType, IElementCreater> createrDic;
+        
         /// <summary>
         /// 从PrefabPathGUID加载所有的预制体
         /// </summary>
@@ -47,6 +48,29 @@ namespace CommonWidget
                 return null;
             }
         }
+        /// <summary>
+        /// 从json文件中加载出配制
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static WidgetItem[] LoadWidgeItems(string json,string assetDir)
+        {
+            var items = new List<WidgetItem>();
+            var jsonarray = JSONNode.Parse(json).AsArray;
+            foreach (var nodeItem in jsonarray)
+            {
+                var jsonClass = nodeItem as JSONClass;
+                if (nodeItem != null && jsonClass != null)
+                {
+                    var item = new WidgetItem();
+                    item.type = (WidgetType)Enum.Parse(typeof(WidgetType), jsonClass[KeyWord.type].Value);
+                    item.name = jsonClass[KeyWord.name].Value;
+                    item.spriteDic = LoadTextures(jsonClass, assetDir);
+                    items.Add(item);
+                }
+            }
+            return items.ToArray();
+        }
         private static List<ObjectHolder> LoadAllSprites(string fullpath)
         {
             var holders = new List<ObjectHolder>();
@@ -63,6 +87,7 @@ namespace CommonWidget
             }
             return holders;
         }
+
         private static List<ObjectHolder> LoadAllUserDefine(string fullPath)
         {
             var holders = new List<ObjectHolder>();
@@ -78,26 +103,14 @@ namespace CommonWidget
                     continue;
                 }
 
-                var node = JSONNode.Parse(jsonString);
-                List<JSONClass> nodes = new List<JSONClass>();
-                if(node.AsObject != null)
+                var jsonarray = JSONArray.Parse(jsonString).AsArray;
+                if (jsonarray == null) continue;
+                
+                foreach (var nodeItem in jsonarray)
                 {
-                    nodes.Add(node.AsObject);
-                }
-                else if(node.AsArray != null)
-                {
-                    foreach (var item in node.AsArray)
+                    if (nodeItem != null && nodeItem is JSONClass)
                     {
-                        var jsonClass = (JSONClass)item;
-                        nodes.Add(jsonClass);
-                    }
-                }
-
-                foreach (var nodeItem in nodes)
-                {
-                    if (nodeItem != null)
-                    {
-                        var holder = new ObjectHolder(assetDir, nodeItem);
+                        var holder = new ObjectHolder(assetDir, (JSONClass)nodeItem);
                         holders.Add(holder);
                     }
                 }
@@ -113,15 +126,20 @@ namespace CommonWidget
             image.SetNativeSize();
         }
 
-        public static GameObject CreateInstence(WidgetType type,CreateInfo info)
+        public static GameObject CreateInstence(WidgetType type,WidgetItem info)
         {
             var creater = GetCreater(type);
             return creater.CreateInstence(info);
         }
-        public static Texture CreatePreview(WidgetType type, CreateInfo info)
+        public static Texture CreatePreview(WidgetType type, WidgetItem info)
         {
             var creater = GetCreater(type);
             return creater.CreatePreview(info);
+        }
+        internal static List<string> GetKeys(WidgetType type)
+        {
+            var creater = GetCreater(type);
+            return creater.Keys;
         }
         private static IElementCreater GetCreater(WidgetType type)
         {
@@ -145,7 +163,28 @@ namespace CommonWidget
             return createrDic[type];
 
         }
+        public static Dictionary<string, Sprite> LoadTextures(JSONClass json,string assetDir)
+        {
+            var spriteDic = new Dictionary<string, Sprite>();
+            if (json[KeyWord.image] != null && json[KeyWord.image].AsObject != null)
+            {
+                var obj = json[KeyWord.image].AsObject;
+                foreach (var item in obj)
+                {
+                    var keyValue = JSONArray.Parse(item.ToString());
+                    if (keyValue.Count < 2 || string.IsNullOrEmpty(keyValue[0]) || string.IsNullOrEmpty(keyValue[1])) continue;
+                    var texturePath = assetDir + keyValue[1];
+                    var texture = AssetDatabase.LoadAssetAtPath<Sprite>(texturePath);
+                    if (texture != null)
+                    {
+                        spriteDic.Add(keyValue[0], texture);
+                    }
+                }
+            }
 
-       
+            return spriteDic;
+        }
+
+
     }
 }

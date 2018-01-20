@@ -15,35 +15,39 @@ using UnityEditor;
 
 namespace CommonWidget
 {
-    public class ImageCreater : IElementCreater
+    public class ImageCreater : ElementCreater
     {
-        public GameObject CreateInstence(CreateInfo info)
+        public override GameObject CreateInstence(WidgetItem info)
         {
             var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Image");
             if (ok)
             {
                 var created = Selection.activeGameObject;
                 var image = Selection.activeGameObject.GetComponent<Image>();
-                if(info.textureDic.ContainsKey(KeyWord.sprite))
+                if(info.spriteDic.ContainsKey(KeyWord.sprite))
                 {
-                    WidgetUtility.InitImage(image, info.textureDic[KeyWord.sprite], Image.Type.Simple);
+                    WidgetUtility.InitImage(image, info.spriteDic[KeyWord.sprite], Image.Type.Simple);
                 }
                 return created;
             }
             return null;
         }
-        public Texture CreatePreview(CreateInfo info)
+        public override Texture CreatePreview(WidgetItem info)
         {
             Texture texture = null;
-            if (info.textureDic.ContainsKey(KeyWord.sprite))
+            if (info.spriteDic.ContainsKey(KeyWord.sprite))
             {
-                var sprite = info.textureDic[KeyWord.sprite];
+                var sprite = info.spriteDic[KeyWord.sprite];
                 if (sprite != null)
                 {
                     texture = sprite.texture;
                 }
             }
             return texture;
+        }
+        protected override List<string> CreateDefultList()
+        {
+            return new List<string>() { KeyWord.sprite };
         }
     }
 }

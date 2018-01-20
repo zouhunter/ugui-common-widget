@@ -26,19 +26,19 @@ namespace CommonWidget
             get
             {
                 if (_preview == null)
-                    _preview = WidgetUtility. CreatePreview(widgetType,new CreateInfo(name, textureDic));
+                    _preview = WidgetUtility.CreatePreview(widgetType, new WidgetItem(name, spriteDic));
                 return _preview;
             }
         }
         public string menuName { get { return widgetType.ToString(); } }
-        public Dictionary<string, Sprite> textureDic { get { if (_textures == null) _textures = LoadTextures(); return _textures; } }
+        public Dictionary<string, Sprite> spriteDic { get { if (_textures == null) _textures = WidgetUtility.LoadTextures(json, assetDir); return _textures; } }
 
         private JSONClass json;
         private string assetDir;
 
-        public ObjectHolder(string dir,JSONClass json)
+        public ObjectHolder(string dir, JSONClass json)
         {
-            if(json[KeyWord.name] != null)
+            if (json[KeyWord.name] != null)
             {
                 this.name = json[KeyWord.name];
             }
@@ -48,8 +48,8 @@ namespace CommonWidget
             }
             this.assetDir = dir;
             effective = true;
-          
-            this.json = json; 
+
+            this.json = json;
 
             if (string.IsNullOrEmpty(json.ToString()) || string.IsNullOrEmpty(json[KeyWord.type].Value))
             {
@@ -80,20 +80,21 @@ namespace CommonWidget
         {
             RectTransform parent = null;
             var lastTrans = Selection.activeTransform;
-            if(lastTrans != null && lastTrans is RectTransform){
+            if (lastTrans != null && lastTrans is RectTransform)
+            {
                 parent = lastTrans as RectTransform;
             }
             else
             {
                 var canvas = GameObject.FindObjectOfType<Canvas>();
-                if(canvas != null)
+                if (canvas != null)
                 {
                     parent = canvas.GetComponent<RectTransform>();
                 }
                 else
                 {
                     var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Canvas");
-                    if(ok)
+                    if (ok)
                     {
                         parent = Selection.activeGameObject.GetComponent<RectTransform>();
                     }
@@ -104,9 +105,10 @@ namespace CommonWidget
                 }
             }
             Selection.activeObject = parent;
-            var info = new CreateInfo(name, textureDic);
-            var created = WidgetUtility.CreateInstence(widgetType,info);
-            if (created != null) {
+            var info = new WidgetItem(name, spriteDic);
+            var created = WidgetUtility.CreateInstence(widgetType, info);
+            if (created != null)
+            {
                 created.transform.SetParent(parent, false);
                 created.name = name;
                 created.transform.localPosition = Vector3.zero;
@@ -114,27 +116,8 @@ namespace CommonWidget
             return created;
         }
 
-  
 
-        private Dictionary<string, Sprite> LoadTextures()
-        {
-            var textureDic = new Dictionary<string, Sprite>();
 
-            var temp = JSONClass.Parse(json.ToString()).AsObject;
-            temp.Remove("type");
-            foreach (var item in temp)
-            {
-                var keyValue = JSONArray.Parse(item.ToString());
-                if (keyValue.Count < 2 || string.IsNullOrEmpty(keyValue[0]) || string.IsNullOrEmpty(keyValue[1])) continue;
-                var texturePath = assetDir + keyValue[1];
-                var texture = AssetDatabase.LoadAssetAtPath<Sprite>(texturePath);
-                if (texture != null)
-                {
-                    textureDic.Add(keyValue[0], texture);
-                }
-            }
-            return textureDic;
-        }
 
     }
 }

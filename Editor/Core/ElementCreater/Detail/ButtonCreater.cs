@@ -15,20 +15,20 @@ using UnityEditor;
 
 namespace CommonWidget
 {
-    public class ButtonCreater : IElementCreater
+    public class ButtonCreater : ElementCreater
     {
-        public GameObject CreateInstence(CreateInfo info)
+        public override GameObject CreateInstence(WidgetItem info)
         {
             var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Button");
             if (ok)
             {
                 var created = Selection.activeGameObject;
-                var textureDic = info.textureDic;
+                var spriteDic = info.spriteDic;
                 var btn = created.GetComponent<Button>();
 
-                if (textureDic.ContainsKey(KeyWord.normal))
+                if (spriteDic.ContainsKey(KeyWord.normal))
                 {
-                    var texture = textureDic[KeyWord.normal];
+                    var texture = spriteDic[KeyWord.normal];
 
                     var image = btn.targetGraphic as Image;
                     image.sprite = texture;
@@ -39,7 +39,7 @@ namespace CommonWidget
                     text.text = info.name;
                 }
 
-                foreach (var item in textureDic)
+                foreach (var item in spriteDic)
                 {
                     if (item.Key == KeyWord.normal) continue;
                     btn.transition = Selectable.Transition.SpriteSwap;
@@ -68,16 +68,20 @@ namespace CommonWidget
                 return null;
             }
         }
-
-        public Texture CreatePreview(CreateInfo info)
+        public override Texture CreatePreview(WidgetItem info)
         {
             Texture texture = null;
-            var textureDic = info.textureDic;
-            if (textureDic.ContainsKey(KeyWord.normal)){
-                var sprite = textureDic[KeyWord.normal];
+            var spriteDic = info.spriteDic;
+            if (spriteDic.ContainsKey(KeyWord.normal))
+            {
+                var sprite = spriteDic[KeyWord.normal];
                 texture = sprite.texture;
             }
             return texture;
+        }
+        protected override List<string> CreateDefultList()
+        {
+            return new List<string>() { KeyWord.normal,KeyWord.pressed,KeyWord.highlighted,KeyWord.disabled };
         }
     }
 }

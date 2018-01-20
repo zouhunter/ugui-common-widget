@@ -15,27 +15,27 @@ using UnityEditor;
 
 namespace CommonWidget
 {
-    public class ToggleCreater : IElementCreater
+    public class ToggleCreater : ElementCreater
     {
-        public GameObject CreateInstence(CreateInfo info)
+        public override GameObject CreateInstence(WidgetItem info)
         {
             var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Toggle");
             if (ok)
             {
                 var created = Selection.activeGameObject;
-                var textureDic = info.textureDic;
+                var spriteDic = info.spriteDic;
                 var toggle = created.GetComponent<Toggle>();
                 var background = toggle.targetGraphic as Image;
                 var mask = toggle.graphic as Image;
-                if(textureDic.ContainsKey(KeyWord.background))
+                if(spriteDic.ContainsKey(KeyWord.background))
                 {
-                    background.sprite = textureDic[KeyWord.background];
+                    background.sprite = spriteDic[KeyWord.background];
                     background.type = Image.Type.Simple;
                     background.SetNativeSize();
                 }
-                if (textureDic.ContainsKey(KeyWord.mask))
+                if (spriteDic.ContainsKey(KeyWord.mask))
                 {
-                    mask.sprite = textureDic[KeyWord.mask];
+                    mask.sprite = spriteDic[KeyWord.mask];
                     background.type = Image.Type.Simple;
                     background.SetNativeSize();
                 }
@@ -49,16 +49,19 @@ namespace CommonWidget
                 return null;
             }
         }
-
-        public Texture CreatePreview(CreateInfo info)
+        public override Texture CreatePreview(WidgetItem info)
         {
             Texture2D texture = null;
-            var textureDic = info.textureDic;
-            if (textureDic.ContainsKey(KeyWord.background)){
-                var sprite = textureDic[KeyWord.background];
+            var spriteDic = info.spriteDic;
+            if (spriteDic.ContainsKey(KeyWord.background)){
+                var sprite = spriteDic[KeyWord.background];
                 texture = sprite.texture as Texture2D;
             }
             return texture;
+        }
+        protected override List<string> CreateDefultList()
+        {
+            return new List<string>() { KeyWord.background, KeyWord.mask};
         }
     }
 }
