@@ -20,7 +20,7 @@ namespace CommonWidget
     public static class WidgetUtility
     {
         //保存预制体的文件夹自动生成的guid（如果发生了变化请重写）
-        private const string SpritePathGUID = "f336f1d680afb0d4b8ca64b381dd3d6c";
+        private const string prefer_sprites_folder_guid = "prefer_sprites_folder_guid";
         //打开窗口的猜到，可自定义
         public const string Menu_widgetWindow = "Window/CommonWidget";
         private static Dictionary<WidgetType, IElementCreater> createrDic;
@@ -31,12 +31,9 @@ namespace CommonWidget
             {
                 if (string.IsNullOrEmpty(_defultSpritePath))
                 {
-                    string guid = SpritePathGUID;
-                    _defultSpritePath = AssetDatabase.GUIDToAssetPath(guid);
-
-                    if (PlayerPrefs.HasKey(SpritePathGUID))
+                    if (PlayerPrefs.HasKey(prefer_sprites_folder_guid))
                     {
-                        guid = PlayerPrefs.GetString(SpritePathGUID);
+                        var guid = PlayerPrefs.GetString(prefer_sprites_folder_guid);
                         _defultSpritePath = AssetDatabase.GUIDToAssetPath(guid);
                     }
                 }
@@ -48,7 +45,7 @@ namespace CommonWidget
                 {
                     _defultSpritePath = value;
                     var guid = AssetDatabase.AssetPathToGUID(value);
-                    PlayerPrefs.SetString(SpritePathGUID, guid);
+                    PlayerPrefs.SetString(prefer_sprites_folder_guid, guid);
                 }
             }
         }
@@ -98,7 +95,6 @@ namespace CommonWidget
             }
             else
             {
-                Debug.LogError("[加载对象失败] " + "保存预制体的文件夹.meta发生了变化，请重新设置本脚本中的PrefabPathGUID");
                 return null;
             }
         }

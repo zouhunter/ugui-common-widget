@@ -54,8 +54,7 @@ namespace CommonWidget
         }
         private void OnGUI()
         {
-            EditorGUILayout.PropertyField(scriptProp);
-            DrawUserPath();
+            DrawHeader();
             DrawBodyContent();
         }
 
@@ -73,6 +72,8 @@ namespace CommonWidget
             {
                 using (var ver = new EditorGUILayout.VerticalScope(GUILayout.Width(width * 0.3f), GUILayout.Height(height)))
                 {
+                    WidgetUtility.DrawContentColor(ver.rect, Color.green);
+
                     using (var scroll = new EditorGUILayout.ScrollViewScope(scroll_left, false, true))
                     {
                         scroll_left = scroll.scrollPosition;
@@ -82,11 +83,14 @@ namespace CommonWidget
 
                 using (var ver = new EditorGUILayout.VerticalScope(GUILayout.Width(width * 0.7f), GUILayout.Height(height)))
                 {
+                    WidgetUtility.DrawContentColor(ver.rect, Color.green);
+
                     DrawScrollViewObjs(width * 0.7f, height * 0.9f);
 
                     using (var hor0 = new EditorGUILayout.HorizontalScope(GUILayout.Width(width * 0.7f), GUILayout.Height(height * 0.1f)))
                     {
                         WidgetUtility.DrawContentColor(hor0.rect, Color.green);
+
                         DrawToolButtons();
                     }
                 }
@@ -96,25 +100,28 @@ namespace CommonWidget
 
         private void DrawWidghtsOptions(float width)
         {
+            if (menus == null) return;
             using (var ver = new EditorGUILayout.VerticalScope(GUILayout.Width(width)))
             {
-                for (int i = 0; i < menus.Length; i++)
-                {
-                    var menuName = menus[i];
-                    Color color = GUI.contentColor;
-                    GUI.contentColor = i == currToolbar ? Color.green : color;
-                    if (GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(width - 20)))
+                    for (int i = 0; i < menus.Length; i++)
                     {
-                        currToolbar = i;
-                        LoadCurrObjects();
+                        var menuName = menus[i];
+                        Color color = GUI.contentColor;
+                        GUI.contentColor = i == currToolbar ? Color.green : color;
+                        if (GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(width - 20)))
+                        {
+                            currToolbar = i;
+                            LoadCurrObjects();
+                        }
+                        GUI.contentColor = color;
                     }
-                    GUI.contentColor = color;
-                }
             }
         }
 
         private void MakeUISpriteTypeBack()
         {
+            if (allobjhs == null) return;
+
             foreach (var item in allobjhs)
             {
                 if (item.spriteDic == null) continue;
@@ -135,11 +142,7 @@ namespace CommonWidget
         private void UpdateObjectHolders()
         {
             allobjhs = WidgetUtility.LoadAllGameObject(userPath);
-            if (allobjhs == null)
-            {
-                Close();
-            }
-            else
+            if (allobjhs != null)
             {
                 List<string> menus = new List<string>();
                 for (int i = 0; i < allobjhs.Length; i++)
@@ -175,39 +178,50 @@ namespace CommonWidget
             }
         }
 
-        private void DrawUserPath()
+        private void DrawHeader()
         {
-            using (var hor = new EditorGUILayout.HorizontalScope())
+            using (var ver = new EditorGUILayout.VerticalScope(GUILayout.Height(3 * EditorGUIUtility.singleLineHeight)))
             {
-                EditorGUILayout.LabelField("自定义加载路径:", GUILayout.Width(100));
-                if (GUILayout.Button(userPath, EditorStyles.label))
-                {
-                    var folder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(userPath);
-                    Selection.activeObject = folder;
-                }
+                WidgetUtility.DrawContentColor(ver.rect, Color.yellow);
 
-                if (GUILayout.Button("选择", EditorStyles.miniButtonRight, GUILayout.Width(40)))
+                EditorGUILayout.PropertyField(scriptProp);
+
+                GUILayout.Space(5);
+
+                using (var hor = new EditorGUILayout.HorizontalScope())
                 {
-                    if (Selection.activeObject != null && ProjectWindowUtil.IsFolder(Selection.activeInstanceID))
+
+                    EditorGUILayout.LabelField("自定义加载路径:", GUILayout.Width(100));
+                    if (GUILayout.Button(userPath, EditorStyles.label))
                     {
-                        var path = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
-                        userPath = path;
-                        currobjhs = null;
-                        UpdateObjectHolders();
+                        var folder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(userPath);
+                        Selection.activeObject = folder;
                     }
-                    else
+
+                    if (GUILayout.Button("选择", EditorStyles.miniButtonRight, GUILayout.Width(40)))
                     {
-                        var folder = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, "");
-                        folder = folder.Replace(Application.dataPath, "Assets");
-                        if (!string.IsNullOrEmpty(folder))
+                        if (Selection.activeObject != null && ProjectWindowUtil.IsFolder(Selection.activeInstanceID))
                         {
-                            userPath = folder;
+                            var path = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
+                            userPath = path;
                             currobjhs = null;
                             UpdateObjectHolders();
+                        }
+                        else
+                        {
+                            var folder = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, "");
+                            folder = folder.Replace(Application.dataPath, "Assets");
+                            if (!string.IsNullOrEmpty(folder))
+                            {
+                                userPath = folder;
+                                currobjhs = null;
+                                UpdateObjectHolders();
+                            }
                         }
                     }
                 }
             }
+           
         }
 
         private void DrawToolButtons()
@@ -305,7 +319,7 @@ namespace CommonWidget
             var coner = new Vector3[4];
             rectt.GetWorldCorners(coner);
 
-            float xmin_p = Mathf.Min(parent_coner.Select(x=>x.x).ToArray());
+            float xmin_p = Mathf.Min(parent_coner.Select(x => x.x).ToArray());
             float xmax_p = Mathf.Max(parent_coner.Select(x => x.x).ToArray());
             float ymin_p = Mathf.Min(parent_coner.Select(x => x.y).ToArray());
             float ymax_p = Mathf.Max(parent_coner.Select(x => x.y).ToArray());
