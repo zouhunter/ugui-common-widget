@@ -31,9 +31,25 @@ namespace CommonWidget
             {
                 if (string.IsNullOrEmpty(_defultSpritePath))
                 {
-                    _defultSpritePath = AssetDatabase.GUIDToAssetPath(SpritePathGUID);
+                    string guid = SpritePathGUID;
+                    _defultSpritePath = AssetDatabase.GUIDToAssetPath(guid);
+
+                    if (PlayerPrefs.HasKey(SpritePathGUID))
+                    {
+                        guid = PlayerPrefs.GetString(SpritePathGUID);
+                        _defultSpritePath = AssetDatabase.GUIDToAssetPath(guid);
+                    }
                 }
                 return _defultSpritePath;
+            }
+            set
+            {
+                if(_defultSpritePath != value)
+                {
+                    _defultSpritePath = value;
+                    var guid = AssetDatabase.AssetPathToGUID(value);
+                    PlayerPrefs.SetString(SpritePathGUID, guid);
+                }
             }
         }
 

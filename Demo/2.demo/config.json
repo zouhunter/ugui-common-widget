@@ -1,0 +1,1 @@
+[ {"type":"Button", "name":"button_c", "image":{"normal":"返回.png"}}, {"type":"Image", "name":"tip", "image":{"sprite":"讲解框.png"}}, {"type":"InputField", "name":"inputfield", "image":{"background":"底图2.png"}}, {"type":"Button", "name":"close", "image":{"normal":"关闭1.png", "pressed":"关闭2.png"}}, {"type":"Button", "name":"button_a", "image":{"normal":"底图3.png"}} ]

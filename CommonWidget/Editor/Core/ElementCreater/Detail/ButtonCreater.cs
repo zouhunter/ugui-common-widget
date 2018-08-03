@@ -67,6 +67,14 @@ namespace CommonWidget
                 btn.spriteState = state;
             }
         }
+        protected override Component CreateInstence(WidgetItem info)
+        {
+            var component = base.CreateInstence(info);
+            if(component != null){
+                component.GetComponentInChildren<Text>().text = "";
+            }
+            return component;
+        }
         public override List<Sprite> GetPreviewList(WidgetItem info)
         {
             List<Sprite> List = new List<Sprite>();

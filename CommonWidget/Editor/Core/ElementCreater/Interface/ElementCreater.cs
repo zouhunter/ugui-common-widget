@@ -1,15 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Audio;
-using UnityEngine.Events;
-using UnityEngine.Sprites;
-using UnityEngine.Scripting;
-using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Assertions.Comparers;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEditor;
@@ -32,20 +21,30 @@ namespace CommonWidget
             }
             else
             {
-                var ok = EditorApplication.ExecuteMenuItem(MenuPath);
-                if (ok)
+                var instence = CreateInstence(info);
+                if(instence)
                 {
-                    var created = Selection.activeGameObject;
-                    var btn = created.GetComponent(CommponentType);
-                    btn.name = info.name;
-                    Undo.RecordObject(btn, "charge:" + btn.name);
-                    ChargeWidgetInfo(btn, info);
-                    return btn.gameObject;
+                    instence.name = info.name;
+                    Undo.RecordObject(instence, "charge:" + instence.name);
+                    ChargeWidgetInfo(instence, info);
+                    return instence.gameObject;
                 }
             }
 
             return null;
         }
+        protected virtual Component CreateInstence(WidgetItem info)
+        {
+            var ok = EditorApplication.ExecuteMenuItem(MenuPath);
+            if (ok)
+            {
+                var created = Selection.activeGameObject;
+                var btn = created.GetComponent(CommponentType);
+                return btn;
+            }
+            return null;
+        }
+
         protected abstract void ChargeWidgetInfo(Component component, WidgetItem info);
     }
 

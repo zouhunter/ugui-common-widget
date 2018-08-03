@@ -31,14 +31,24 @@ namespace CommonWidget
         private ObjectHolder[] allobjhs;
         private ObjectHolder[] currobjhs;
         private Vector3 scrollpos;
-        private string userPath;
+        private string userPath
+        {
+            get
+            {
+                return WidgetUtility.defultSpritePath;
+            }
+            set
+            {
+                WidgetUtility.defultSpritePath = value;
+            }
+        }
         private string match;
         private Vector2 scroll_left;
+
         private void OnEnable()
         {
             serializeObj = new SerializedObject(this);
             scriptProp = serializeObj.FindProperty("m_Script");
-            userPath = WidgetUtility.defultSpritePath;
             UpdateObjectHolders();
         }
         private void OnGUI()
@@ -178,6 +188,17 @@ namespace CommonWidget
                         userPath = path;
                         currobjhs = null;
                         UpdateObjectHolders();
+                    }
+                    else
+                    {
+                       var folder = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, "");
+                        folder = folder.Replace(Application.dataPath,"Assets");
+                        if (!string.IsNullOrEmpty(folder))
+                        {
+                            userPath = folder;
+                            currobjhs = null;
+                            UpdateObjectHolders();
+                        }
                     }
                 }
             }
