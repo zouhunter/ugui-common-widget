@@ -42,7 +42,7 @@ namespace CommonWidget
                 var image = btn.targetGraphic as Image;
                 image.sprite = texture;
                 image.type = Image.Type.Simple;
-                image.SetNativeSize();
+                WidgetUtility.SetNativeSize(image);
             }
 
             foreach (var item in spriteDic)

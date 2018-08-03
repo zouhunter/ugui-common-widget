@@ -53,6 +53,26 @@ namespace CommonWidget
             }
         }
 
+        internal static void SetNativeSize(Image image)
+        {
+            var sprite = image.sprite;
+            if(sprite != null)
+            {
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, sprite.textureRect.width);
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, sprite.textureRect.height);
+            }
+        }
+
+        internal static void SetNativeSize(RawImage image)
+        {
+            var texture = image.texture;
+            if (texture != null)
+            {
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, texture.width);
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, texture.height);
+            }
+        }
+
         /// <summary>
         /// 从PrefabPathGUID加载所有的预制体
         /// </summary>
@@ -192,13 +212,13 @@ namespace CommonWidget
         {
             image.sprite = sprite;
             image.type = Image.Type.Simple;
-            image.SetNativeSize();
+            WidgetUtility.SetNativeSize(image);
         }
 
         internal static void InitRawImage(RawImage image, Texture texture)
         {
             image.texture = texture;
-            image.SetNativeSize();
+            WidgetUtility.SetNativeSize(image);
         }
 
         public static GameObject CreateOrCharge(WidgetType type, WidgetItem info)

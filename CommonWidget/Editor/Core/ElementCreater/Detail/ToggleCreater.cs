@@ -41,13 +41,13 @@ namespace CommonWidget
             {
                 background.sprite = spriteDic[KeyWord.background];
                 background.type = Image.Type.Simple;
-                background.SetNativeSize();
+                WidgetUtility.SetNativeSize(background);
             }
             if (spriteDic.ContainsKey(KeyWord.mask))
             {
                 mask.sprite = spriteDic[KeyWord.mask];
                 background.type = Image.Type.Simple;
-                background.SetNativeSize();
+                WidgetUtility.SetNativeSize(background);
             }
         }
   

@@ -50,7 +50,7 @@ namespace CommonWidget
                 {
                     bar.SetDirection(Scrollbar.Direction.BottomToTop, true);
                 }
-                image.SetNativeSize();
+                WidgetUtility.SetNativeSize(image);
             }
 
             if (dic.ContainsKey(KeyWord.handle))
