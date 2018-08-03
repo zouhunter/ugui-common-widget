@@ -78,42 +78,17 @@ namespace CommonWidget
 
         public GameObject CreateInstence()
         {
-            RectTransform parent = null;
             var lastTrans = Selection.activeTransform;
-            if (lastTrans != null && lastTrans is RectTransform)
-            {
-                parent = lastTrans as RectTransform;
-            }
-            else
+            if (lastTrans == null || !(lastTrans is RectTransform))
             {
                 var canvas = GameObject.FindObjectOfType<Canvas>();
-                if (canvas != null)
-                {
-                    parent = canvas.GetComponent<RectTransform>();
-                }
-                else
-                {
-                    var ok = EditorApplication.ExecuteMenuItem("GameObject/UI/Canvas");
-                    if (ok)
-                    {
-                        parent = Selection.activeGameObject.GetComponent<RectTransform>();
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                if (canvas == null){
+                    EditorApplication.ExecuteMenuItem("GameObject/UI/Canvas");
                 }
             }
 
-            Selection.activeObject = parent;
             var info = new WidgetItem(name, spriteDic);
-            info.parent = parent;
             var created = WidgetUtility.CreateOrCharge(widgetType, info);
-            if (created != null)
-            {
-                created.transform.SetParent(parent, false);
-                created.transform.localPosition = Vector3.zero;
-            }
             return created;
         }
     }

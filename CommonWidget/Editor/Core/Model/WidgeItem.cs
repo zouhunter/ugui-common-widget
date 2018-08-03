@@ -19,7 +19,6 @@ namespace CommonWidget
     {
         public WidgetType type;
         public string name;
-        public Transform parent;
         public Dictionary<string, Sprite> spriteDic;
         public Dictionary<string, Sprite> catchDic;//防止误操作
         public WidgetItem() { }

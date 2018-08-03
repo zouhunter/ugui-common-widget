@@ -12,7 +12,7 @@ namespace CommonWidget
         protected abstract Type CommponentType { get; }
         public override GameObject CreateOrCharge(WidgetItem info)
         {
-            var oldBtn = info.parent.GetComponent(CommponentType);
+            var oldBtn = Selection.activeTransform == null ? null : Selection.activeTransform.GetComponent(CommponentType);
             if (oldBtn != null)
             {
                 Undo.RecordObject(oldBtn, "charge:" + oldBtn.name);
@@ -27,6 +27,8 @@ namespace CommonWidget
                     instence.name = info.name;
                     Undo.RecordObject(instence, "charge:" + instence.name);
                     ChargeWidgetInfo(instence, info);
+                    instence.transform.SetParent(Selection.activeTransform, false);
+                    instence.transform.localPosition = Vector3.zero;
                     return instence.gameObject;
                 }
             }
