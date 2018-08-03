@@ -22,6 +22,7 @@ namespace CommonWidget
         Image,
         Dropdown,
         InputField,
+        RawImage,
         CercalSlider
     }
 }

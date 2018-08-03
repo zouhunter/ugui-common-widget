@@ -64,8 +64,16 @@ namespace CommonWidget
             if (!string.IsNullOrEmpty(spritePath))
             {
                 var fullPath = Path.GetFullPath(spritePath);
-                holders.AddRange(LoadAllUserDefine(fullPath));
-                holders.AddRange(LoadAllSprites(fullPath));
+                var userDefines = LoadAllUserDefine(fullPath);
+                var sprites = LoadAllSprites(fullPath);
+                holders.AddRange(userDefines);
+                foreach (var item in sprites)
+                {
+                    if(holders.Find(x=>x.name == item.name) == null)
+                    {
+                        holders.Add(item);
+                    }
+                }
                 return holders.ToArray();
             }
             else
@@ -184,6 +192,12 @@ namespace CommonWidget
         {
             image.sprite = sprite;
             image.type = Image.Type.Simple;
+            image.SetNativeSize();
+        }
+
+        internal static void InitRawImage(RawImage image, Texture texture)
+        {
+            image.texture = texture;
             image.SetNativeSize();
         }
 

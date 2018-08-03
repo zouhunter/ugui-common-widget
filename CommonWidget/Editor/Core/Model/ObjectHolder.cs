@@ -70,7 +70,7 @@ namespace CommonWidget
 
         public ObjectHolder(Sprite sprite)
         {
-            widgetType = WidgetType.Image;
+            widgetType = WidgetType.RawImage;
             name = sprite.name;
             _textures = new Dictionary<string, Sprite>();
             _textures.Add(KeyWord.sprite, sprite);
