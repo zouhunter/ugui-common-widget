@@ -103,18 +103,18 @@ namespace CommonWidget
             if (menus == null) return;
             using (var ver = new EditorGUILayout.VerticalScope(GUILayout.Width(width)))
             {
-                    for (int i = 0; i < menus.Length; i++)
+                for (int i = 0; i < menus.Length; i++)
+                {
+                    var menuName = menus[i];
+                    Color color = GUI.contentColor;
+                    GUI.contentColor = i == currToolbar ? Color.green : color;
+                    if (GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(width - 20)))
                     {
-                        var menuName = menus[i];
-                        Color color = GUI.contentColor;
-                        GUI.contentColor = i == currToolbar ? Color.green : color;
-                        if (GUILayout.Button(menuName, EditorStyles.toolbarButton, GUILayout.Width(width - 20)))
-                        {
-                            currToolbar = i;
-                            LoadCurrObjects();
-                        }
-                        GUI.contentColor = color;
+                        currToolbar = i;
+                        LoadCurrObjects();
                     }
+                    GUI.contentColor = color;
+                }
             }
         }
 
@@ -221,7 +221,7 @@ namespace CommonWidget
                     }
                 }
             }
-           
+
         }
 
         private void DrawToolButtons()
@@ -234,9 +234,13 @@ namespace CommonWidget
                     OpenConfigWindow();
                 }
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("ALINE", GUILayout.Width(60)))
+                if(GUILayout.Button("ALINE", GUILayout.Width(60)))
                 {
-                    AlineTransform();
+                    AnchorsUtil.AnchorsToCorners();
+                }
+                if (GUILayout.Button("Expand", GUILayout.Width(60)))
+                {
+                    AnchorsUtil.CornersToAnchors();
                 }
             }
         }
@@ -245,23 +249,7 @@ namespace CommonWidget
         {
             ConfigWidow.GetWindow<ConfigWidow>("配制面板", true);
         }
-
-        private void AlineTransform()
-        {
-            var obj = Selection.activeTransform;
-            if (obj != null && obj.parent != null)
-            {
-                var rectTrans = obj.GetComponent<RectTransform>();
-                var parentTrans = obj.transform.parent.GetComponent<RectTransform>();
-                if (rectTrans != null && parentTrans != null)
-                {
-                    SetCustomAnchor(parentTrans, rectTrans);
-                    return;
-                }
-            }
-            EditorUtility.DisplayDialog("未选中", "请先选中需要Aline的对象", "确定");
-        }
-
+        
         private void DrawScrollViewObjs(float scrollwidth, float scrollheight)
         {
             using (var scro = new EditorGUILayout.ScrollViewScope(scrollpos, GUILayout.Width(scrollwidth), GUILayout.Height(scrollheight)))
@@ -312,27 +300,6 @@ namespace CommonWidget
             }
         }
 
-        public static void SetCustomAnchor(RectTransform parentRectt, RectTransform rectt)
-        {
-            var parent_coner = new Vector3[4];
-            parentRectt.GetWorldCorners(parent_coner);
-            var coner = new Vector3[4];
-            rectt.GetWorldCorners(coner);
-
-            float xmin_p = Mathf.Min(parent_coner.Select(x => x.x).ToArray());
-            float xmax_p = Mathf.Max(parent_coner.Select(x => x.x).ToArray());
-            float ymin_p = Mathf.Min(parent_coner.Select(x => x.y).ToArray());
-            float ymax_p = Mathf.Max(parent_coner.Select(x => x.y).ToArray());
-
-            float xmin = Mathf.Min(coner.Select(x => x.x).ToArray());
-            float xmax = Mathf.Max(coner.Select(x => x.x).ToArray());
-            float ymin = Mathf.Min(coner.Select(x => x.y).ToArray());
-            float ymax = Mathf.Max(coner.Select(x => x.y).ToArray());
-
-            rectt.anchorMin = new Vector2(xmin / (xmax_p - xmin_p), ymin / (ymax_p - ymin_p));
-            rectt.anchorMax = new Vector2(xmax / (xmax_p - xmin_p), ymax / (ymax_p - ymin_p));
-            rectt.anchoredPosition = Vector3.zero;
-            rectt.sizeDelta = Vector3.zero;
-        }
+        
     }
 }
