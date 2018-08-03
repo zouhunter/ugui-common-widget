@@ -1,0 +1,1 @@
+[ {"type":"Slider", "name":"slider01", "image":{"handle":"LoadingBar_Empty.png", "background":"LoadingBar_Full.png"}}, {"type":"Slider", "name":"slider02", "image":{"handle":"LoadingBar_Empty.png", "background":"LoadingBar_Full.png"}}, {"type":"Slider", "name":"slider03", "image":{"handle":"LoadingBar_Empty.png", "background":"LoadingBar_Full.png"}} ]
